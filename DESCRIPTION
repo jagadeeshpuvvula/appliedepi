@@ -1,0 +1,41 @@
+Package: appliedepi
+Type: Package
+Title: Wrapper functions to automate epidemiologic analysis workflows
+Version: 0.1.0
+Author: Jagadeesh Puvvula
+Maintainer: Jagadeesh Puvvula <jagadeesh.puvvula@gmail.com>
+Description: This package covers automation of epidemiologic analysis. The analyses include Multiple linear regression (multipl exposures and outcome matrix), Joint association models (Q-gcomp and BKMR), Multiple informant model with multiple imputions in parallel environment, Metabolomics (MWAS, metabolite annotations, functional analysis), and DNAmethylation (minfi preprocessing, EWAS, differential methylation)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+URL: https://github.com/jagadeeshpuvvula/appliedepi
+BugReports: https://github.com/jagadeeshpuvvula/appliedepi/issues
+Depends: 
+    R (>= 2.10),
+    CpGassoc,
+    ENmix,
+    minfi,
+    sva,
+    wateRmelon
+Imports: 
+    gglasso,
+    glmnet,
+    grpreg,
+    pacman,
+    sparsegl,
+    stabs,
+    stats,
+    qgcomp,
+    tidyverse,
+    bkmr,
+    fields,
+    scales,
+    future.apply,
+    future,
+    RColorBrewer
+RoxygenNote: 7.2.3
