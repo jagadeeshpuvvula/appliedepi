@@ -16,13 +16,22 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/annotate_and_save.html</loc>
+  </url>
+  <url>
     <loc>/reference/bkmr_cohort.html</loc>
   </url>
   <url>
     <loc>/reference/bkmr_sex.html</loc>
   </url>
   <url>
+    <loc>/reference/enrichment_summary.html</loc>
+  </url>
+  <url>
     <loc>/reference/ewas_loop_pll.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ewas_summary.html</loc>
   </url>
   <url>
     <loc>/reference/extract_data_from_folder.html</loc>
@@ -41,6 +50,9 @@
   </url>
   <url>
     <loc>/reference/missing_data_summary.html</loc>
+  </url>
+  <url>
+    <loc>/reference/perform_gene_enrichment.html</loc>
   </url>
   <url>
     <loc>/reference/print_version_info.html</loc>

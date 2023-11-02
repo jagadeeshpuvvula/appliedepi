@@ -3,13 +3,15 @@
 #' @param folder_path folder location that contain the enriched results in csv format
 #' @param output_folder folder to save results
 #'
-#' @return
+#' @return returns summary of all ewas enrichment results
 #' @export
+#'
+#' @import tidyverse
 #'
 #' @example
 #' \donttest{
-enrichment_summary(folder_path = "~/Documents/methylation_pilot/res_enriched_cell_cnt",
-                   output_folder = "~/Documents/methylation_pilot/res_enriched_cell_cnt")
+#'enrichment_summary(folder_path = "~/Documents/methylation_pilot/res_enriched_cell_cnt",
+#'                   output_folder = "~/Documents/methylation_pilot/res_enriched_cell_cnt")
 #' }
 enrichment_summary <- function(folder_path, output_folder) {
   # Get a list of CSV files in the folder

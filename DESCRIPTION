@@ -21,7 +21,8 @@ Depends:
     ENmix,
     minfi,
     sva,
-    wateRmelon
+    wateRmelon,
+    missMethyl
 Imports: 
     gglasso,
     glmnet,

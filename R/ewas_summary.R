@@ -5,6 +5,9 @@
 #' @return returns a summary of the associations by exposure-methylation data combinations
 #' @export
 #'
+#' @import parallel
+#' @import tidyverse
+#'
 #' @example
 #' \donttest{
 #' ewas_summary("~/Documents/methylation_pilot/res_cell_cnt")

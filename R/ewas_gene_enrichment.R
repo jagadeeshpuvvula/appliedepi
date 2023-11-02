@@ -4,12 +4,15 @@
 #' @param output_folder location to save the results
 #'
 #' @return returns a csv that will contain pathways associated with input CpGs with q-value <0.05 as threshold
+#'
+#' @import tidyverse
+#' @import missMethyl
 #' @export
 #'
 #' @example
 #' \donttest{
-perform_gene_enrichment(input_folder = "~/Documents/methylation_pilot/res_annotated_cell_cnt",
-                        output_folder = "~/Documents/methylation_pilot/res_enriched_cell_cnt")
+#'perform_gene_enrichment(input_folder = "~/Documents/methylation_pilot/res_annotated_cell_cnt",
+#'                        output_folder = "~/Documents/methylation_pilot/res_enriched_cell_cnt")
 #' }
 perform_gene_enrichment <- function(input_folder, output_folder) {
   # Get a list of files in the input folder
