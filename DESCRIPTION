@@ -37,8 +37,7 @@ Imports:
     scales,
     future.apply,
     future,
-    RColorBrewer
-importFrom:
+    RColorBrewer,
     utils,
     packageVersion
 RoxygenNote: 7.2.3
