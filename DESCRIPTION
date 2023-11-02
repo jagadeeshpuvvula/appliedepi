@@ -38,4 +38,7 @@ Imports:
     future.apply,
     future,
     RColorBrewer
+importFrom:
+    utils,
+    packageVersion
 RoxygenNote: 7.2.3
