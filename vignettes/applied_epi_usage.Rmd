@@ -1,0 +1,42 @@
+---
+title: "applied_epi_usage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{applied_epi_usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# `appliedepi` : Wrapper functions to automate environmental epidemiology workflows
+## Package is a work in progress
+<!-- badges: start -->
+<!-- badges: end -->
+```{r, results='asis', echo=FALSE}
+cat(
+  '<ul style="color: royalblue; font-size: 25px;">',
+  '<li>This package covers automation of</li>',
+  '<ul>',
+  '<li>Joint association models (Q-gcomp, BKMR)</li>',
+  '<li>Multiple informant model using multiple imputations in parallel environment</li>',
+  '<li>Metabolomics (MWAS, metabolite annotations, functional analysis)</li>',
+  '<li>DNAmethylation (minfi preprocessing, EWAS, differential methylation)</li>',
+  '</ul>',
+  '</ul>'
+)
+```
+
+## Installation
+``` r
+remotes::install_github("jagadeeshpuvvula/appliedepi")
+```
+
+Repository is distributed under the GPL-3 License.
