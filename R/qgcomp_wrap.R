@@ -18,62 +18,57 @@
 #'
 #' @example
 #' \donttest{
-#'qgcomp_func(outcomes = c("wppsi_fsiq", "wppsi_viq", "wppsi_piq"),
-#'            output_folder = "E:/BBK17/pj/data_2023apr/results/qgcomp/qgcomp_29chem_wo_wisc",
-#'            include_sex = TRUE, include_cohort = TRUE,
-#'            chemicals = "~log_Pb+log_Hg+log_DMA+log_DDE+log_PBDE_47+log_PCB_118+
-#'                          log_PCB_138+log_PCB_153+log_PCB_180+log_PFHxS+log_PFOA+log_PFOS+",
-#'            covariates= "race_bin + log_cotinine +mom_edu_cat + home_score_total + parity_n + mom_age",
-#'            q=4,
-#'            b=400, seed=2023,
-#'            dat = dat)
+#'qgcomp_func(outcomes = c("wppsi_fsiq", "wppsi_viq", "wppsi_piq"), 
+#'            data = dat,
+#'            output_folder = "E:/BBK17/pj/data_2023apr/results/qgcomp/qgcomp_29chem", 
+#'            include_sex = TRUE, 
+#'            include_cohort = TRUE, 
+#'            chemicals = list("log_Pb", "log_Hg", "log_DMA", "log_DDE", "log_PBDE_47", "log_PCB_118", "log_PCB_138", "log_PCB_153", "log_PCB_180", "log_PFHxS", "log_PFOA", "log_PFOS", "log_BCEtP", "log_BDCPP", "log_DBuP", "log_DPhP", "log_TCS", "log_BPA", "log_MBP", "log_MBZP", "log_MCPP", "log_sigma_DEHP", "log_MEP", "log_MIBP", "log_di_Ethyl_OP", "log_di_Methyl_OP", "log_B_PB", "log_M_PB", "log_P_PB"),
+#'            covariates = list("race_bin", "log_cotinine", "mom_edu_cat", "home_score_total", "parity_n", "mom_age", "fish_int_pm"),
+#'            q = 10, b=400, seed = 2022)
 #'
 #' }
-qgcomp_func <- function(outcomes, dat, output_folder, chemicals, covariates,
+qgcomp_func <- function(outcomes, data, output_folder, chemicals, covariates, 
                         include_sex = TRUE, include_cohort = TRUE, q, b, seed) {
+  
+  sex_levels <- if (include_sex) c("all", "Female", "Male") else "all"
+  cohort_levels <- if (include_cohort) c("all", "home", "mirec") else "all"
 
-  for (sex_level in c("all", "Female", "Male")) {
-    if (include_sex) {
-      if (sex_level == "all") {
-        sex_data <- dat
-        sex_formula <- "sex + "
-      } else {
-        sex_data <- subset(dat, sex == sex_level)
-        sex_formula <- ""
-      }
+  for (sex_level in sex_levels) {
+    if (sex_level == "all") {
+      sex_data <- data
+      sex_formula <- "sex"
     } else {
-      sex_data <- dat
+      sex_data <- subset(data, sex == sex_level)
       sex_formula <- ""
     }
 
-    for (cohort_level in c("all", "home", "mirec")) {
-      if (include_cohort) {
-        if (cohort_level == "all") {
-          cohort_data <- sex_data
-          cohort_formula <- "cohort + city+"
-          filename_prefix <- paste0(sex_level, "_all")
-        } else if (cohort_level == "home") {
-          cohort_data <- subset(sex_data, cohort == "1")
-          cohort_formula <- ""
-          filename_prefix <- paste0(sex_level, "_home")
-        } else if (cohort_level == "mirec") {
-          cohort_data <- subset(sex_data, cohort == "2")
-          cohort_formula <- "city +"
-          filename_prefix <- paste0(sex_level, "_mirec")
-        } else {
-          stop("Invalid cohort level")
-        }
-      } else {
+    for (cohort_level in cohort_levels) {
+      if (cohort_level == "all") {
         cohort_data <- sex_data
-        cohort_formula <- ""
+        cohort_formula <- "+cohort + city"
         filename_prefix <- paste0(sex_level, "_all")
+      } else if (cohort_level == "home") {
+        cohort_data <- subset(sex_data, cohort == "1")
+        cohort_formula <- ""
+        filename_prefix <- paste0(sex_level, "_home")
+      } else if (cohort_level == "mirec") {
+        cohort_data <- subset(sex_data, cohort == "2")
+        cohort_formula <- "+city"
+        filename_prefix <- paste0(sex_level, "_mirec")
+      } else {
+        stop("Invalid cohort level")
       }
-
-      for(outcome in outcomes){
-        formula <- as.formula(paste(outcome, chemicals, sex_formula, cohort_formula, covariates))
-
-        nb <- qgcomp.noboot(formula, expnms = mixture, data = cohort_data, family= gaussian(), q=q)
-        boot <- qgcomp.boot(formula, expnms = mixture, data = cohort_data, family= gaussian(), q=q, B = b, seed = seed)
+      
+      for (outcome in outcomes) {
+        formula <- as.formula(paste(outcome, "~", 
+                                    paste(chemicals, collapse = " + "), "+",
+                                    sex_formula, "+",
+                                    cohort_formula, "+",
+                                    paste(covariates, collapse = " + ")))
+        
+        nb <- qgcomp.noboot(formula, expnms = mixture, data = cohort_data, family = gaussian(), q = q)
+        boot <- qgcomp.boot(formula, expnms = mixture, data = cohort_data, family = gaussian(), q = q, B = b, seed = seed)
         save(nb, file = paste0(output_folder, "/", "nb_", filename_prefix, "_", outcome, ".rda"))
         save(boot, file = paste0(output_folder, "/", "boot_", filename_prefix, "_", outcome, ".rda"))
       }
