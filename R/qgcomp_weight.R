@@ -49,8 +49,8 @@ extract_weights <- function(folder_location) {
       psi1 <- NA
     }
     
-    psi_df <- data.frame(chemical = "neg.psi", weight = nb$neg.psi, direction = "neg", file_name = file_name) |>
-      rbind(data.frame(chemical = "pos.psi", weight = nb$pos.psi, direction = "pos", file_name = file_name)) |>
+    psi_df <- data.frame(chemical = "neg.psi", weight = nb$neg.psi, direction = "neg_psi", file_name = file_name) |>
+      rbind(data.frame(chemical = "pos.psi", weight = nb$pos.psi, direction = "pos_psi", file_name = file_name)) |>
       rbind(data.frame(chemical = "psi1", weight = nb$psi, direction = "psi1", file_name = file_name))
     
     # Append psi_df to weights_df
