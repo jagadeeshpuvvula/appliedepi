@@ -32,22 +32,36 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
   ci_lower_list <- list()
   ci_upper_list <- list()
 
+  if ("sex" %in% colnames(data)) {
+    sex_present <- TRUE
+  } else {
+    sex_present <- FALSE
+    include_sex <- FALSE
+  }
+
+  if ("cohort" %in% colnames(data)) {
+    cohort_present <- TRUE
+  } else {
+    cohort_present <- FALSE
+    include_cohort <- FALSE
+  }
+
   sex_levels <- if (include_sex) c("all", "Female", "Male") else "all"
   cohort_levels <- if (include_cohort) c("all", "home", "mirec") else "all"
 
   for (sex_level in sex_levels) {
-    if (sex_level == "all") {
+    if (sex_level == "all" || !sex_present) {
       sex_data <- data
-      sex_formula <- "+sex"
+      sex_formula <- ""
     } else {
       sex_data <- subset(data, sex == sex_level)
-      sex_formula <- ""
+      sex_formula <- "+sex"
     }
 
     for (cohort_level in cohort_levels) {
-      if (cohort_level == "all") {
+      if (cohort_level == "all" || !cohort_present) {
         cohort_data <- sex_data
-        cohort_formula <- "+cohort + city"
+        cohort_formula <- ""
       } else if (cohort_level == "home") {
         cohort_data <- subset(sex_data, cohort == "1")
         cohort_formula <- ""
