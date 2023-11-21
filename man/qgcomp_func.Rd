@@ -6,7 +6,7 @@
 \usage{
 qgcomp_func(
   outcomes,
-  dat,
+  data,
   output_folder,
   chemicals,
   covariates,
@@ -19,8 +19,6 @@ qgcomp_func(
 }
 \arguments{
 \item{outcomes}{input a list of outcome variables}
-
-\item{dat}{input dataset in tibble format}
 
 \item{output_folder}{complete location to a folder to save the output RDA files}
 
@@ -37,6 +35,8 @@ qgcomp_func(
 \item{b}{input a numeric value for number of random bootstrap samples}
 
 \item{seed}{input a numeric value for random sample generation for bootstrap process}
+
+\item{dat}{input dataset in tibble format}
 }
 \value{
 This function will return RDA output files for each model run by boot and non-bootstrap method. Filenames will specify boot or nonboot, sex or cohort specific, and outcome name.

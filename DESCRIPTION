@@ -16,13 +16,7 @@ VignetteBuilder: knitr
 URL: https://github.com/jagadeeshpuvvula/appliedepi
 BugReports: https://github.com/jagadeeshpuvvula/appliedepi/issues
 Depends: 
-    R (>= 2.10),
-    CpGassoc,
-    ENmix,
-    minfi,
-    sva,
-    wateRmelon,
-    missMethyl
+    R (>= 2.10)
 Imports: 
     gglasso,
     glmnet,
@@ -38,5 +32,18 @@ Imports:
     scales,
     future.apply,
     future,
-    RColorBrewer
+    doParallel,
+    tools,
+    minfi,
+    wateRmelon,
+    ENmix,
+    sva,
+    CpGassoc,
+    missMethyl,
+    doParallel
+ImportsFrom:
+  utils,
+  packageVersion,
+  read.csv,
+  write.csv
 RoxygenNote: 7.2.3

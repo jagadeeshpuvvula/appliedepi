@@ -7,6 +7,7 @@
 #' @export
 #'
 #' @import tidyverse
+#' @import tools
 #'
 #' @example
 #' \donttest{

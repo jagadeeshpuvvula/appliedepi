@@ -8,7 +8,6 @@
 #' @import minfi
 #' @import wateRmelon
 #' @import ENmix
-#' @import RColorBrewer
 #' @import sva
 #'
 #' @example
