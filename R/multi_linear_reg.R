@@ -13,7 +13,7 @@
 #'
 #' @example
 #'\donttest{
-#'lm_reas<- lm_func(dependent_vars = c("wppsi_fsiq", "wppsi_viq", "wppsi_piq"),
+#'lm_func(dependent_vars = c("wppsi_fsiq", "wppsi_viq", "wppsi_piq"),
 #'                  independent_vars=c("log_Pb", "log_Hg", "log_DMA", "log_DDE", "log_PBDE_47"),
 #'                  covariates = c("log_cotinine", "home_score_total", "mom_age"),
 #'                  dat = dat, include_sex = TRUE, include_cohort = TRUE)

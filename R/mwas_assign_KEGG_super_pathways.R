@@ -1,24 +1,16 @@
-#' Add KEGG superpathways to the pathways enriched from the PEA analysis
-#' Run pathway_list before using this function or will result in errors
+#' Assigns KEGG super pathways to the mummichog results (load curated list first)
 #'
-#' @param data dataframe that contain mummichog results in global environment
-#' @param pathway_column name of the variable that has pathway names
-#' @param pathway_list Curated list of KEGG pathways for mapping pathways to groups
+#' @param data input dataframe that contain all mummichog results
+#' @param group_column dummy variable that takes the group names
+#' @param pathway_column variable that has the pathway names
+#' @param pathway_list load this from the separate R file available in this library
 #'
 #' @return
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' dat <- assignGroup(dat,
-#'                     pathway_column = "pathway",
-#'                     pathway_list = pathways)
-#' }
-#'
-#'
-#'
-assignGroup <- function(data, pathway_column, pathway_list) {
-  data$group <- "other"
+assignGroup <- function(data, group_column, pathway_column, pathway_list) {
+  group_column <- "other"
 
   for (i in 1:nrow(data)) {
     pathway <- tolower(data[[pathway_column]][i])
@@ -41,7 +33,7 @@ assignGroup <- function(data, pathway_column, pathway_list) {
 
     # If the closest match is below a certain threshold, assign the group
     if (min_distance < 3) {  # Adjust the threshold as needed
-      data$group[i] <- closest_match
+      data$group_column[i] <- closest_match
     }
   }
 

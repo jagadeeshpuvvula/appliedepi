@@ -62,6 +62,15 @@
         </td>
         <td><p>CpG annotate and save csv files</p></td>
       </tr><tr><td>
+          <p><code><a href="assignGroup.html">assignGroup()</a></code> </p>
+        </td>
+        <td><p>Add KEGG superpathways to the pathways enriched from the PEA analysis
+Run pathway_list before using this function or will result in errors</p></td>
+      </tr><tr><td>
+          <p><code><a href="bind_mwas_res_from_folder.html">bind_mwas_res_from_folder()</a></code> </p>
+        </td>
+        <td><p>This function will bind rows across the csv files in a given target folder</p></td>
+      </tr><tr><td>
           <p><code><a href="bkmr_cohort.html">bkmr_cohort()</a></code> </p>
         </td>
         <td><p>BKMR wrapper performing cohort specific loops. Load Matrix and bindrcpp packages</p></td>
@@ -69,6 +78,15 @@
           <p><code><a href="bkmr_sex.html">bkmr_sex()</a></code> </p>
         </td>
         <td><p>BKMR wrapper performing sex specific loops. Load Matrix and bindrcpp packages</p></td>
+      </tr><tr><td>
+          <p><code><a href="calculatePvalCutoff.html">calculatePvalCutoff()</a></code> </p>
+        </td>
+        <td><p>Manually get p-value cutoffs based on the 500 features with lowest p-values
+use along with the runMummichog function</p></td>
+      </tr><tr><td>
+          <p><code><a href="combine_csv_files.html">combine_csv_files()</a></code> </p>
+        </td>
+        <td><p>Combines mummuchog output files into a single dataframe</p></td>
       </tr><tr><td>
           <p><code><a href="enrichment_summary.html">enrichment_summary()</a></code> </p>
         </td>
@@ -90,6 +108,10 @@
         </td>
         <td><p>Extract bkmr PIPs from all RDA files - prep for Shiny object</p></td>
       </tr><tr><td>
+          <p><code><a href="extract_weights.html">extract_weights()</a></code> </p>
+        </td>
+        <td><p>Extract chemical weights contributed to the joint association using non bootstrap quantile g-computation.</p></td>
+      </tr><tr><td>
           <p><code><a href="get_gcomp_estimates.html">get_gcomp_estimates()</a></code> </p>
         </td>
         <td><p>Extract results from the qgcomp output RDA files. Iterates though the RDA files and compiles results in tibble format</p></td>
@@ -98,9 +120,23 @@
         </td>
         <td><p>Multiple linear regression wrapper function that will take a list of exposure and outcome variables. Returns a matrix of results between each combination</p></td>
       </tr><tr><td>
+          <p><code><a href="match_sequence.html">match_sequence()</a></code> </p>
+        </td>
+        <td><p>match sequence - validation step before getting into MWAS loop
+match the exposure dataset with the metabolome sequence
+metabolome each observation is a feature and each variable is a subject
+Whereas the exposure/covariate dataset each observation is a subject</p></td>
+      </tr><tr><td>
           <p><code><a href="missing_data_summary.html">missing_data_summary()</a></code> </p>
         </td>
         <td><p>Missing data summary, prints frequency and count</p></td>
+      </tr><tr><td>
+          <p><code><a href="mwas_lm_loop.html">mwas_lm_loop()</a></code> </p>
+        </td>
+        <td><p>mwas loop - perform linear regression between each feature and exposure metric provided in the input
+metabolome data will be transposed in the function
+input metabolome features and exposures are in different dataframes
+runtime 17,000 * 70 * 17 matrix takes around 10 mins</p></td>
       </tr><tr><td>
           <p><code><a href="perform_gene_enrichment.html">perform_gene_enrichment()</a></code> </p>
         </td>
@@ -108,19 +144,28 @@
       </tr><tr><td>
           <p><code><a href="print_version_info.html">print_version_info()</a></code> </p>
         </td>
-        <td><p>Prints detailed summary of the R environment including libraries and dependencies</p></td>
+        <td><p>Prints detailed summary of the R environment including dependencies</p></td>
       </tr><tr><td>
           <p><code><a href="process_methylation_data.html">process_methylation_data()</a></code> </p>
         </td>
         <td><p>Process methylation data using minfi pipeline. This function will drop samples with GT 5 percent high detection p-values, probes with at least one high detection p-value, Sex chromosomes, loci associated with single-nucleotide polymorphisms and cross-hybridizing probes. Additionally, will preprocess using Noob for background correction and dye bias normalization, BMIQ for probe design bias, batch correction using ComBat.</p></td>
       </tr><tr><td>
-          <p><code><a href="qgcomp_extract_weights.html">qgcomp_extract_weights()</a></code> </p>
-        </td>
-        <td><p>Extract chemical weights contributed to the joint association using non bootstrap quantile g-computation.</p></td>
-      </tr><tr><td>
           <p><code><a href="qgcomp_func.html">qgcomp_func()</a></code> </p>
         </td>
         <td><p>Quantile g-computation wrapper function to automate analysis for multiple outcomes. Additionally, allows flexibility to perform stratified analysis.</p></td>
+      </tr><tr><td>
+          <p><code><a href="runMummichog.html">runMummichog()</a></code> </p>
+        </td>
+        <td><p>Performs Pathway Enrichment Analysis (PEA) using mummichog function available from metaboAnalystR library
+This function also prints the p-value theshold on scree that is being used for the analysis</p></td>
+      </tr><tr><td>
+          <p><code><a href="split_and_export.html">split_and_export()</a></code> </p>
+        </td>
+        <td><p>Split MWAS LM result files from a single dataframe to .txt files for PEA mummichog</p></td>
+      </tr><tr><td>
+          <p><code><a href="summarize_variables.html">summarize_variables()</a></code> </p>
+        </td>
+        <td><p>Summarize categorical and continuous variables</p></td>
       </tr><tr><td>
           <p><code><a href="var_selec.html">var_selec()</a></code> </p>
         </td>

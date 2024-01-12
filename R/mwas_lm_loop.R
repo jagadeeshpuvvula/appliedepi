@@ -18,7 +18,7 @@
 #'             exposures = names(mom_dat)[4:20],
 #'             covar = c("bmi", "mom_age", "pgtob", "mom_edu", "mom_race"),
 #'             output_folder = "~/Documents/phth_phe_MWAS/result/lm_mwas",
-#'             mwas_file_name = "mom_mwas.csv", #computes lm by each exposure but compiles all results in a single csv
+#'             mwas_file_name = "mom_mwas.csv", #compiles all results in a single csv
 #'             fdr_cutoff = 0.2)
 #' }
 

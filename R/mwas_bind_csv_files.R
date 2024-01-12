@@ -6,7 +6,7 @@
 #' @return this function will return a dataframe within the global environment
 #' @examples
 #' \donttest{
-#' data_combined <- bind_mwas_res_from_folder(paste0(result,"lm_mwas"))
+#' bind_mwas_res_from_folder(paste0(result,"lm_mwas"))
 #' }
 #'
 #'

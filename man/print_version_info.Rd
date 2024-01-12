@@ -2,7 +2,7 @@
 % Please edit documentation in R/print_env.R
 \name{print_version_info}
 \alias{print_version_info}
-\title{Prints detailed summary of the R environment including libraries and dependencies}
+\title{Prints detailed summary of the R environment including dependencies}
 \usage{
 print_version_info()
 }
@@ -10,5 +10,10 @@ print_version_info()
 displays R environment summary
 }
 \description{
-Prints detailed summary of the R environment including libraries and dependencies
+Prints detailed summary of the R environment including dependencies
+}
+\examples{
+\donttest{
+print_version_info()
+}
 }

@@ -7,7 +7,7 @@
 #'
 #' @examples
 #' \donttest{
-#'enrich_data <- combine_csv_files("~/Documents/phth_phe_MWAS/result/enrich_imp")
+#'combine_csv_files("~/Documents/phth_phe_MWAS/result/enrich_imp")
 #' }
 #'
 #'
