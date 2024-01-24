@@ -3,8 +3,6 @@
 
 # `appliedepi` : Wrapper functions to automate environmental epidemiology workflows
 
-## Package is a work in progress
-
 <!-- badges: start -->
 <!-- badges: end -->
 <ul style="color: royalblue; font-size: 25px;">
@@ -34,6 +32,7 @@ DNAmethylation (minfi preprocessing, EWAS, differential methylation)
 remotes::install_github("jagadeeshpuvvula/appliedepi")
 ```
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8319744.svg)](https://doi.org/10.5281/zenodo.8319744)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8319744.svg)](https://doi.org/10.5281/zenodo.10498931)
 
-Repository is distributed under the GPL-3 License.
+Repository is distributed under the Creative Commons Attribution 4.0
+International License.
