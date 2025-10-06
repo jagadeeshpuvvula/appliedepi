@@ -129,7 +129,3 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
   # Return the dataframe
   return(results)
 }
-
-  # Return the dataframe
-  return(results)
-}
