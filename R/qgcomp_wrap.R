@@ -31,23 +31,22 @@
 #'
 qgcomp_func <- function(outcomes, data, output_folder, chemicals, covariates,
                         include_sex = TRUE, include_cohort = TRUE, q, b, seed) {
-
   sex_levels <- if (include_sex) c("all", "Female", "Male") else "all"
   cohort_levels <- if (include_cohort) c("all", "home", "mirec") else "all"
-
+  
   for (sex_level in sex_levels) {
     if (sex_level == "all") {
       sex_data <- data
-      sex_formula <- "sex"
+      sex_formula <- if (include_sex) "sex" else ""
     } else {
       sex_data <- subset(data, sex == sex_level)
       sex_formula <- ""
     }
-
+    
     for (cohort_level in cohort_levels) {
       if (cohort_level == "all") {
         cohort_data <- sex_data
-        cohort_formula <- "+cohort + city"
+        cohort_formula <- if (include_cohort) "cohort + city" else ""
         filename_prefix <- paste0(sex_level, "_all")
       } else if (cohort_level == "home") {
         cohort_data <- subset(sex_data, cohort == "1")
@@ -55,23 +54,50 @@ qgcomp_func <- function(outcomes, data, output_folder, chemicals, covariates,
         filename_prefix <- paste0(sex_level, "_home")
       } else if (cohort_level == "mirec") {
         cohort_data <- subset(sex_data, cohort == "2")
-        cohort_formula <- "+city"
+        cohort_formula <- "city"
         filename_prefix <- paste0(sex_level, "_mirec")
       } else {
         stop("Invalid cohort level")
       }
-
+      
       for (outcome in outcomes) {
-        formula <- as.formula(paste(outcome, "~",
-                                    paste(chemicals, collapse = " + "), "+",
-                                    sex_formula, "+",
-                                    cohort_formula, "+",
-                                    paste(covariates, collapse = " + ")))
-
-        nb <- qgcomp.noboot(formula, expnms = mixture, data = cohort_data, family = gaussian(), q = q)
-        boot <- qgcomp.boot(formula, expnms = mixture, data = cohort_data, family = gaussian(), q = q, B = b, seed = seed)
+        # Build formula components
+        formula_parts <- c(chemicals)
+        if (sex_formula != "") formula_parts <- c(formula_parts, sex_formula)
+        if (cohort_formula != "") formula_parts <- c(formula_parts, cohort_formula)
+        formula_parts <- c(formula_parts, covariates)
+        
+        # Identify all variables needed for THIS SPECIFIC outcome model
+        all_vars <- c(outcome, chemicals, covariates)
+        if (sex_formula != "") all_vars <- c(all_vars, "sex")
+        if (cohort_formula != "") {
+          cohort_vars <- unlist(strsplit(cohort_formula, " \\+ "))
+          all_vars <- c(all_vars, cohort_vars)
+        }
+        
+        # Remove rows with missing values ONLY for variables in THIS model
+        cohort_data_complete <- cohort_data[complete.cases(cohort_data[, all_vars]), ]
+        
+        # Check if there's enough data left
+        if (nrow(cohort_data_complete) < 20) {
+          warning(paste("Skipping", outcome, "for", filename_prefix, 
+                       "- insufficient complete cases (n =", nrow(cohort_data_complete), ")"))
+          next
+        }
+        
+        formula <- as.formula(paste(outcome, "~", paste(formula_parts, collapse = " + ")))
+        
+        nb <- qgcomp.noboot(formula, expnms = chemicals, data = cohort_data_complete, 
+                           family = gaussian(), q = q)
+        boot <- qgcomp.boot(formula, expnms = chemicals, data = cohort_data_complete, 
+                           family = gaussian(), q = q, B = b, seed = seed)
+        
         save(nb, file = paste0(output_folder, "/", "nb_", filename_prefix, "_", outcome, ".rda"))
         save(boot, file = paste0(output_folder, "/", "boot_", filename_prefix, "_", outcome, ".rda"))
+        
+        # Optional: Print sample size for this model
+        cat(sprintf("Completed: %s | %s | n = %d\n", 
+                   filename_prefix, outcome, nrow(cohort_data_complete)))
       }
     }
   }
