@@ -59,13 +59,9 @@ mwas_lm_loop <- function(feature_table, exp_cov_data, output_folder, mwas_file_n
   }
   
   # ===== QC STEP 4: Reorder and subset data to match =====
-  # Reorder exp_cov_data to match the order in feature_table
   exp_cov_data <- exp_cov_data[match(matching_ids, exp_cov_ids), ]
-  
-  # Subset feature_table to include only matching IDs, keeping order from exp_cov_data
   feature_table <- feature_table[, c(1, match(matching_ids, feature_table_ids) + 1)]
   
-  # Verify matching was successful
   if (!all(names(feature_table)[2:ncol(feature_table)] == exp_cov_data[[participant_id_col]])) {
     stop("Failed to properly match participant IDs between datasets")
   }
@@ -96,7 +92,6 @@ mwas_lm_loop <- function(feature_table, exp_cov_data, output_folder, mwas_file_n
   }
   
   message(paste("QC: All", length(exposures), "exposures and", length(covar), "covariates found"))
-  message(paste("QC: All", length(exposures), "exposures and", length(covar), "covariates found"))
   
   # ===== QC STEP 7: Validate sex_var if needed =====
   if (analyze_by_sex) {
@@ -107,94 +102,110 @@ mwas_lm_loop <- function(feature_table, exp_cov_data, output_folder, mwas_file_n
     message("QC: Sex variable distribution:")
     print(sex_summary)
   }
-  if (analyze_by_sex) {
-    sex_levels <- unique(exp_cov_data[[sex_var]])
-    sex_levels <- sex_levels[!is.na(sex_levels)]
-    analysis_groups <- as.list(sex_levels)
-    names(analysis_groups) <- sex_levels
-  } else {
-    analysis_groups <- list(all = 1:nrow(exp_cov_data))
-    names(analysis_groups) <- "all"
-  }
   
   result_list <- list()
   
-  # Loop through sex groups (or single "all" group if not analyzing by sex)
-  for (sex_group in names(analysis_groups)) {
-    
-    # Subset data for current sex group
-    if (analyze_by_sex) {
-      group_indices <- which(exp_cov_data[[sex_var]] == sex_group)
-      current_exp_cov_data <- exp_cov_data[group_indices, ]
-      # Subset feature_table by columns (samples), not rows (metabolites)
-      current_feature_table <- feature_table[, c(1, group_indices + 1)]
-    } else {
-      current_exp_cov_data <- exp_cov_data
-      current_feature_table <- feature_table
-    }
-    
-    # Remove sex_var from covariates if analyzing by sex
-    current_covar <- covar
-    if (analyze_by_sex && sex_var %in% covar) {
-      current_covar <- covar[covar != sex_var]
-    }
+  # Helper function to run analysis
+  run_analysis <- function(current_feature_table, current_exp_cov_data, current_covar, analysis_name, sex_group_label) {
+    message(paste("=== Analyzing:", analysis_name, "(n =", nrow(current_exp_cov_data), ") ==="))
     
     for (variable in exposures) {
       current_results <- data.frame(matrix(nrow = nrow(current_feature_table), ncol = 4))
       names(current_results) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
       
       for (i in 1:nrow(current_feature_table)) {
-        metabolite <- unlist(current_feature_table[i, -c(1)]) # store the ith metabolite in a new vector
+        metabolite <- unlist(current_feature_table[i, -c(1)])
         
-        # Create proper data frame for lm() instead of using formula string
+        # Create formula
         covar_str <- if (length(current_covar) > 0) paste("+", paste(current_covar, collapse = " + ")) else ""
         formula_str <- as.formula(paste("metabolite ~", variable, covar_str))
         
-        # Create a proper data frame with all variables for lm()
+        # Create model data
         model_data <- cbind(metabolite = metabolite, current_exp_cov_data)
         
         tryCatch({
           model <- lm(formula_str, data = model_data)
           current_results[i, ] <- summary(model)$coefficients[2, c(1:4)]
         }, error = function(e) {
-          # Handle cases where the model fails to fit
           current_results[i, ] <<- NA
-          warning(paste("Model fitting failed for metabolite", i, "and variable", variable, ":", e$message))
+          warning(paste("Model fitting failed for metabolite", i, "and variable", variable))
         })
       }
       
-      current_results$FDR <- p.adjust(current_results[[4]], method = "fdr") # fdr adjustment
-      current_results <- cbind(current_feature_table[c(1)], current_results) # add mz and time
+      current_results$FDR <- p.adjust(current_results[[4]], method = "fdr")
+      current_results <- cbind(current_feature_table[c(1)], current_results)
       current_results$Variable <- variable
       
-      # Add sex group identifier if analyzing by sex
       if (analyze_by_sex) {
-        current_results$Sex <- sex_group
-        result_key <- paste(variable, sex_group, sep = "_")
-      } else {
-        result_key <- variable
+        current_results$Sex <- sex_group_label
       }
       
-      result_list[[result_key]] <- current_results
+      result_key <- paste(variable, sex_group_label, sep = "_")
+      result_list[[result_key]] <<- current_results
     }
   }
   
-  MWAS_result <- do.call(rbind, result_list) # combine all results into one data frame
+  # ===== STEP 1: OVERALL ANALYSIS (all observations with sex_var as covariate only if analyzing by sex) =====
+  message("\n>>> STEP 1: OVERALL ANALYSIS <<<")
   
-  # Reset row names to avoid duplicates and confusion
+  # When performing sex-stratified analysis, include sex_var as a covariate in the overall model to adjust for sex effects
+  if (analyze_by_sex) {
+    overall_covar <- unique(c(covar, sex_var))
+    overall_sex_label <- "overall"
+  } else {
+    overall_covar <- covar
+    overall_sex_label <- "all"
+  }
+  
+  run_analysis(
+    current_feature_table = feature_table,
+    current_exp_cov_data = exp_cov_data,
+    current_covar = overall_covar,
+    analysis_name = "Overall (all observations)",
+    sex_group_label = overall_sex_label
+  )
+  
+  # ===== STEP 2: SEX-STRATIFIED ANALYSIS (if analyze_by_sex = TRUE) =====
+  if (analyze_by_sex) {
+    message("\n>>> STEP 2: SEX-STRATIFIED ANALYSIS <<<")
+    sex_levels <- unique(exp_cov_data[[sex_var]])
+    sex_levels <- sex_levels[!is.na(sex_levels)]
+    sex_levels <- sort(sex_levels)
+    
+    for (sex_group in sex_levels) {
+      group_indices <- which(exp_cov_data[[sex_var]] == sex_group)
+      current_exp_cov_data <- exp_cov_data[group_indices, ]
+      current_feature_table <- feature_table[, c(1, group_indices + 1)]
+      current_covar <- covar[covar != sex_var]  # Remove sex_var for stratified analysis
+      
+      run_analysis(
+        current_feature_table = current_feature_table,
+        current_exp_cov_data = current_exp_cov_data,
+        current_covar = current_covar,
+        analysis_name = paste(sex_group, "only"),
+        sex_group_label = sex_group
+      )
+    }
+  }
+  
+  MWAS_result <- do.call(rbind, result_list)
   rownames(MWAS_result) <- NULL
   
   # Calculate beta_dir variable
-  MWAS_result$beta_dir <- case_when(
+  MWAS_result$beta_dir <- dplyr::case_when(
     MWAS_result$FDR < fdr_cutoff & MWAS_result$Estimate > 0 ~ "positive-significant",
     MWAS_result$FDR < fdr_cutoff & MWAS_result$Estimate < 0 ~ "negative-significant",
     MWAS_result$FDR >= fdr_cutoff & MWAS_result$Estimate > 0 ~ "positive-non_significant",
     MWAS_result$FDR >= fdr_cutoff & MWAS_result$Estimate < 0 ~ "negative-non_significant",
-    TRUE ~ NA_character_)
+    TRUE ~ NA_character_
+  )
   
   # Save final result to a file
   output_file <- file.path(output_folder, mwas_file_name)
   write.csv(MWAS_result, file = output_file, row.names = FALSE)
+  
+  message("\n>>> ANALYSIS COMPLETE <<<")
+  message(paste("Results saved to:", output_file))
   
   return(MWAS_result)
 }
