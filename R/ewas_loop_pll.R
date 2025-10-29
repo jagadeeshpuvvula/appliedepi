@@ -26,43 +26,55 @@
 #'
 #' }
 ewas_loop_pll <- function(exposures, covariates, bVals_list, bVals_names, dat_pheno, outputFolder) {
-  # Set the number of workers
-  future::plan(future::multisession, workers = 20)
-
-  #get lambda
-  lambda <- function(p) median(qchisq(p, df=1, lower.tail=FALSE), na.rm=TRUE) / qchisq(0.5, df=1)
-
+  # Lambda calculation function
+  lambda <- function(p) {
+    p_clean <- p[!is.na(p)]
+    if (length(p_clean) == 0) return(NA)
+    median(qchisq(p_clean, df = 1, lower.tail = FALSE), na.rm = TRUE) / qchisq(0.5, df = 1)
+  }
+  
   # Iterate over exposures and bVals datasets
   for (variable in exposures) {
     for (i in seq_along(bVals_list)) {
       bVals <- bVals_list[[i]]
-      bVals_name <- bVals_names[[i]]  # Get the dataset name
-
-      if (variable %in% exposures) {
-        message("Processing variable: ", variable, " with bVals dataset: ", bVals_name)
-
+      bVals_name <- bVals_names[[i]]
+      
+      message("Processing variable: ", variable, " with bVals dataset: ", bVals_name)
+      
+      tryCatch({
+        # Run EWAS
         ewas <- cpg.assoc(
           bVals,
           indep = dat_pheno[[variable]],
           covariates = as.data.frame(dat_pheno[, covariates]),
-          logit.transform = TRUE)
-
+          logit.transform = TRUE
+        )
+        
+        # Prepare results
         data_manhat <- cbind(ewas$results, ewas$coefficients) |> as_tibble()
-
-        # Calculate and print lambda value
-        lambda_val <- lambda(ewas$results[,3])
+        
+        # Calculate lambda value with error handling
+        lambda_val <- tryCatch(
+          lambda(ewas$results[, 3]),
+          error = function(e) {
+            warning("Lambda calculation failed: ", e$message)
+            NA
+          }
+        )
         message("Lambda value for variable ", variable, " with bVals dataset ", bVals_name, ": ", lambda_val)
-
-        # Modify the file name for RDS to include bVals_name
-        rds_file_name <- paste("ewas_", variable, "_", bVals_name, ".RData", sep = "")
+        
+        # Save results
+        rds_file_name <- paste0("ewas_", variable, "_", bVals_name, ".rds")
         saveRDS(ewas, file = file.path(outputFolder, rds_file_name))
-
-        # Modify the file name for CSV to include bVals_name
-        csv_file_name <- paste("df_manhat_", variable, "_", bVals_name, ".csv", sep = "")
+        
+        csv_file_name <- paste0("df_manhat_", variable, "_", bVals_name, ".csv")
         write_csv(data_manhat, file = file.path(outputFolder, csv_file_name))
-
+        
         message("Processing completed for variable: ", variable, " & methylation dataset: ", bVals_name)
-      }
+        
+      }, error = function(e) {
+        warning("Error processing variable ", variable, " with dataset ", bVals_name, ": ", e$message)
+      })
     }
   }
 }
