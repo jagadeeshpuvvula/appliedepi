@@ -31,7 +31,7 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
   p_value_list <- list()
   ci_lower_list <- list()
   ci_upper_list <- list()
-  n_obs_list <- list()  # NEW: for observation count
+  n_obs_list <- list()
   
   if ("sex" %in% colnames(data)) {
     sex_present <- TRUE
@@ -53,25 +53,30 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
   for (sex_level in sex_levels) {
     if (sex_level == "all" || !sex_present) {
       sex_data <- data
-      sex_formula <- ""
+      # Include sex as covariate when NOT stratifying by sex
+      sex_formula <- if (!include_sex && sex_present) "+ sex" else ""
     } else {
       sex_data <- subset(data, sex == sex_level)
       sex_data <- droplevels(sex_data)
+      # Don't include sex as covariate when stratified by sex
       sex_formula <- ""
     }
     
     for (cohort_level in cohort_levels) {
       if (cohort_level == "all" || !cohort_present) {
         cohort_data <- sex_data
-        cohort_formula <- ""
+        # Include cohort as covariate when NOT stratifying by cohort
+        cohort_formula <- if (!include_cohort && cohort_present) "+ cohort" else ""
       } else if (cohort_level == "home") {
         cohort_data <- subset(sex_data, cohort == "1")
         cohort_data <- droplevels(cohort_data)
+        # Don't include cohort when stratified, but include city for home cohort
         cohort_formula <- ""
       } else if (cohort_level == "mirec") {
         cohort_data <- subset(sex_data, cohort == "2")
         cohort_data <- droplevels(cohort_data)
-        cohort_formula <- "+city"
+        # Don't include cohort when stratified, but include city for mirec cohort
+        cohort_formula <- "+ city"
       } else {
         stop("Invalid cohort level")
       }
@@ -85,7 +90,7 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
           # Run linear regression with dynamic covariates
           formula <- as.formula(paste(dependent_vars[i], "~", independent_vars[j], "+", covariate_formula, sex_formula, cohort_formula))
           
-          # Fit model with na.action = na.exclude to handle NAs
+          # Fit model with na.action = na.omit to handle NAs
           model <- lm(formula, data = cohort_data, na.action = na.omit)
           
           # Calculate confidence interval
@@ -100,7 +105,7 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
           p_value_list[[length(p_value_list) + 1]] <- summary(model)$coefficients[independent_vars[j], 4]
           ci_lower_list[[length(ci_lower_list) + 1]] <- ci[1]
           ci_upper_list[[length(ci_upper_list) + 1]] <- ci[2]
-          n_obs_list[[length(n_obs_list) + 1]] <- nobs(model)  # NEW: number of observations
+          n_obs_list[[length(n_obs_list) + 1]] <- nobs(model)
         }
       }
     }
@@ -116,7 +121,7 @@ lm_func <- function(dependent_vars, independent_vars, data, covariates, include_
     p_value = unlist(p_value_list),
     ci_lower = unlist(ci_lower_list),
     ci_upper = unlist(ci_upper_list),
-    n_obs = unlist(n_obs_list)  # NEW: add observation count
+    n_obs = unlist(n_obs_list)
   )
   
   # Add FDR-adjusted p-values (Benjamini-Hochberg method)
